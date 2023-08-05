@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 public class UserDAOImpl implements UserDAO {
   private static final String CREATE_USER = "INSERT INTO users (username,password,email) VALUES (?,?,?)";
   private static final String UPDATE_USER = "UPDATE users SET username=?,password=?,email=? WHERE id=?";
@@ -24,7 +26,9 @@ public class UserDAOImpl implements UserDAO {
       conn = DataSource.getInstance().getConnection();
       PreparedStatement ps = conn.prepareStatement(CREATE_USER, Statement.RETURN_GENERATED_KEYS);
       ps.setString(1, user.getUsername());
-      ps.setString(2, user.getPassword());
+      // ma hoa mat khau
+      String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+      ps.setString(2, hashedPassword);
       ps.setString(3, user.getEmail());
       ps.executeUpdate();
       ResultSet generatedKeys = ps.getGeneratedKeys();

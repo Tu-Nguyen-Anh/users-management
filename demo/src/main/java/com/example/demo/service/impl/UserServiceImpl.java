@@ -14,6 +14,7 @@ import com.example.demo.util.TokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +96,8 @@ public class UserServiceImpl implements UserService {
       logger.warn("User not found for login: {}", loginRequest.getUsername());
       throw new NotFoundException();
     }
-    if (!loginRequest.getPassword().equals(existingUser.getPassword())) {
+    //giai ma mat khau va so sanh voi password nhap vao
+    if (!BCrypt.checkpw(loginRequest.getPassword(), existingUser.getPassword())) {
       logger.warn("Authentication failed for user: {}", loginRequest.getUsername());
       throw new AuthenticationException();
     }
