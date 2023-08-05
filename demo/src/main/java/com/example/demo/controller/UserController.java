@@ -60,4 +60,10 @@ public class UserController {
     log.info("(login) User logged in successfully: {}", user.getUsername());
     return new ResponseGeneral<>(MessageResponse.LOGIN_SUCCESS, user, HttpStatus.OK.value());
   }
+  @GetMapping("get-user/{username}")
+  public ResponseGeneral<UserResponse> getByUsername(@PathVariable (name = "username") String username) {
+    log.info("Request to get by username.");
+    UserResponse userResponse = userService.getByUsername(username);
+    return new ResponseGeneral<>(MessageResponse.GET_BY_USERNAME, userResponse, HttpStatus.OK.value());
+  }
 }
