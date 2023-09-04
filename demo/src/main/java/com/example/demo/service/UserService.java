@@ -18,5 +18,7 @@ public interface UserService {
 
   UserResponse getByUsername(String username);
 
+  UserResponse getById(int id);
+
   LoginResponse login(LoginRequest loginRequest);
 }

@@ -6,8 +6,9 @@ import com.example.demo.dto.request.LoginRequest;
 import com.example.demo.dto.request.UserRequest;
 import com.example.demo.dto.response.LoginResponse;
 import com.example.demo.dto.response.UserResponse;
-import com.example.demo.exception.AuthenticationException;
-import com.example.demo.exception.NotFoundException;
+import com.example.demo.exception.DuplicateUsernameException;
+import com.example.demo.exception.UserNotFoundException;
+import com.example.demo.exception.base.AuthenticationException;
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
 import com.example.demo.util.TokenUtil;
@@ -27,6 +28,10 @@ public class UserServiceImpl implements UserService {
   @Override
   public UserResponse create(UserRequest userRequest) {
     logger.info("Creating a new user: {}", userRequest.getUsername());
+    User existingUser = userDAO.getByUsername(userRequest.getUsername());
+    if (existingUser != null) {
+      throw new DuplicateUsernameException(userRequest.getUsername());
+    }
     User user = new User(
           userRequest.getUsername(),
           userRequest.getPassword(),
@@ -52,14 +57,18 @@ public class UserServiceImpl implements UserService {
       return userResponse;
     } else {
       logger.warn("User not found with ID: {}", id);
-      throw new NotFoundException();
+      throw new UserNotFoundException(id);
     }
   }
 
   @Override
   public void delete(int id) {
     logger.info("Deleting user with ID: {}", id);
-    userDAO.delete(id);
+    User existingUser = userDAO.getById(id);
+    if (existingUser != null)
+      userDAO.delete(id);
+    else
+      throw new UserNotFoundException(id);
   }
 
   @Override
@@ -68,7 +77,7 @@ public class UserServiceImpl implements UserService {
     List<User> users = userDAO.list();
     List<UserResponse> usersResponse = new ArrayList<>();
     for (User user : users) {
-      UserResponse userResponse = new UserResponse(user.getId(), user.getUsername(), user.getUsername());
+      UserResponse userResponse = new UserResponse(user.getId(), user.getUsername(), user.getEmail());
       usersResponse.add(userResponse);
     }
     return usersResponse;
@@ -79,7 +88,7 @@ public class UserServiceImpl implements UserService {
     logger.info("Retrieving user with username: {}", username);
     User user = userDAO.getByUsername(username);
     if (user == null) {
-      throw new NotFoundException();
+      throw new UserNotFoundException(username);
     }
     UserResponse userResponse = new UserResponse(
           user.getId(),
@@ -87,14 +96,26 @@ public class UserServiceImpl implements UserService {
           user.getEmail());
     return userResponse;
   }
-
+  @Override
+  public UserResponse getById(int id) {
+    logger.info("Retrieving user with id: {}", id);
+    User user = userDAO.getById(id);
+    if (user == null) {
+      throw new UserNotFoundException(id);
+    }
+    UserResponse userResponse = new UserResponse(
+          user.getId(),
+          user.getUsername(),
+          user.getEmail());
+    return userResponse;
+  }
   @Override
   public LoginResponse login(LoginRequest loginRequest) {
     logger.info("Processing login request for user: {}", loginRequest.getUsername());
     User existingUser = userDAO.getByUsername(loginRequest.getUsername());
     if (existingUser == null) {
       logger.warn("User not found for login: {}", loginRequest.getUsername());
-      throw new NotFoundException();
+      throw new UserNotFoundException(loginRequest.getUsername());
     }
     //giai ma mat khau va so sanh voi password nhap vao
     if (!BCrypt.checkpw(loginRequest.getPassword(), existingUser.getPassword())) {
