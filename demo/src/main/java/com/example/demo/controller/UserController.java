@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.constant.Message;
 import com.example.demo.dto.request.LoginRequest;
 import com.example.demo.dto.request.UserRequest;
 import com.example.demo.dto.response.LoginResponse;
@@ -18,6 +17,7 @@ import java.util.List;
 
 import static com.example.demo.constant.Message.LanguageConstants.*;
 import static com.example.demo.constant.Message.MessageResponse.*;
+
 @RestController
 @RequestMapping("api/v1/users")
 public class UserController {
@@ -33,8 +33,7 @@ public class UserController {
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping()
   public ResponseGeneral<UserResponse> create(
-        @RequestBody @Valid UserRequest userRequest,
-        @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+        @RequestBody @Valid UserRequest userRequest
   ) {
     log.info("(create) request: {}", userRequest);
     UserResponse userResponse = userService.create(userRequest);
@@ -44,18 +43,15 @@ public class UserController {
   @PutMapping("{id}")
   public ResponseGeneral<UserResponse> update(
         @RequestBody @Valid UserRequest userRequest,
-        @PathVariable(name = "id") int id,
-        @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
-  ) {
+        @PathVariable(name = "id") int id
+        ) {
     log.info("(update) Request to update user with id {}: {}", id, userRequest);
     UserResponse userResponse = userService.update(userRequest, id);
     return ResponseGeneral.ofSuccess(UPDATE_SUCCESS, userResponse);
   }
 
   @GetMapping()
-  public ResponseGeneral<List<UserResponse>> list(
-        @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
-  ) {
+  public ResponseGeneral<List<UserResponse>> list() {
     log.info("(list) Request to get all users.");
     List<UserResponse> userResponse = userService.list();
     return ResponseGeneral.ofSuccess(LIST_USER, userResponse);
@@ -63,8 +59,7 @@ public class UserController {
 
   @DeleteMapping("{id}")
   public ResponseGeneral<Void> delete(
-        @PathVariable(name = "id") int id,
-        @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+        @PathVariable(name = "id") int id
   ) {
     log.info("(delete) Request to delete user with id: {}", id);
     userService.delete(id);
@@ -73,19 +68,17 @@ public class UserController {
 
   @PostMapping("login")
   public ResponseGeneral<LoginResponse> login(
-        @RequestBody LoginRequest loginRequest,
-        @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+        @RequestBody LoginRequest loginRequest
   ) {
     LoginResponse user = userService.login(loginRequest);
     log.info("(login) User logged in successfully: {}", user.getUsername());
     return new ResponseGeneral<>("success", LOGIN, user);
   }
 
-  @GetMapping("get-by-username/{username}")
+  @GetMapping("{username}")
   public ResponseGeneral<UserResponse> getByUsername(
-        @PathVariable(name = "username") String username,
-        @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
-  ) {
+        @RequestParam String username
+  ){
     log.info("Request to get by username.");
     UserResponse userResponse = userService.getByUsername(username);
     return ResponseGeneral.ofSuccess(GET_BY_USERNAME, userResponse);
@@ -93,8 +86,7 @@ public class UserController {
 
   @GetMapping("{id}")
   public ResponseGeneral<UserResponse> getById(
-        @PathVariable(name = "id") int id,
-        @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+        @PathVariable(name = "id") int id
   ) {
     log.info("Request to get by id.");
     UserResponse userResponse = userService.getById(id);

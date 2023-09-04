@@ -8,6 +8,7 @@ import com.example.demo.dto.response.LoginResponse;
 import com.example.demo.dto.response.UserResponse;
 import com.example.demo.exception.DuplicateUsernameException;
 import com.example.demo.exception.UserNotFoundException;
+import com.example.demo.exception.VerificationException;
 import com.example.demo.exception.base.AuthenticationException;
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
@@ -120,7 +121,7 @@ public class UserServiceImpl implements UserService {
     //giai ma mat khau va so sanh voi password nhap vao
     if (!BCrypt.checkpw(loginRequest.getPassword(), existingUser.getPassword())) {
       logger.warn("Authentication failed for user: {}", loginRequest.getUsername());
-      throw new AuthenticationException();
+      throw new VerificationException();
     }
     String token = TokenUtil.generateToken();
     existingUser.setToken(token);

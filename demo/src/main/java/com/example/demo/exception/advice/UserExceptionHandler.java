@@ -43,6 +43,8 @@ public class UserExceptionHandler {
     } else if (ex instanceof DuplicateUsernameException) {
       String username = ex.getParams().get("username");
       message = "Duplicate Username " + username;
+    }else if (ex instanceof VerificationException) {
+      message = "username or password is incorrect";
     } else {
       message = getMessage(code, ex.getParams(), locale);
     }
@@ -57,6 +59,8 @@ public class UserExceptionHandler {
       errorMessage = "Could not update user";
     } else if (ex instanceof DuplicateUsernameException) {
       errorMessage = "Duplicate Username Exception";
+    }else if (ex instanceof VerificationException) {
+      errorMessage ="Login failure";
     } else {
       errorMessage = "An error has occurred";
     }
