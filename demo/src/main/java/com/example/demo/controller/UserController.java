@@ -15,7 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static com.example.demo.constant.Message.LanguageConstants.*;
+import static com.example.demo.constant.Message.LanguageConstants.DEFAULT_LANGUAGE;
+import static com.example.demo.constant.Message.LanguageConstants.LANGUAGE;
 import static com.example.demo.constant.Message.MessageResponse.*;
 
 @RestController
@@ -33,63 +34,71 @@ public class UserController {
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping()
   public ResponseGeneral<UserResponse> create(
-        @RequestBody @Valid UserRequest userRequest
+        @RequestBody @Valid UserRequest userRequest,
+        @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
   ) {
     log.info("(create) request: {}", userRequest);
     UserResponse userResponse = userService.create(userRequest);
-    return ResponseGeneral.ofSuccess(CREATE_SUCCESS, userResponse);
+    return ResponseGeneral.ofSuccess(messageService.getMessage(SUCCESS, language), userResponse);
   }
 
   @PutMapping("{id}")
   public ResponseGeneral<UserResponse> update(
         @RequestBody @Valid UserRequest userRequest,
-        @PathVariable(name = "id") int id
-        ) {
+        @PathVariable(name = "id") int id,
+        @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+  ) {
     log.info("(update) Request to update user with id {}: {}", id, userRequest);
     UserResponse userResponse = userService.update(userRequest, id);
-    return ResponseGeneral.ofSuccess(UPDATE_SUCCESS, userResponse);
+    return ResponseGeneral.ofSuccess(messageService.getMessage(SUCCESS, language), userResponse);
   }
 
   @GetMapping()
-  public ResponseGeneral<List<UserResponse>> list() {
+  public ResponseGeneral<List<UserResponse>> list(
+        @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+  ) {
     log.info("(list) Request to get all users.");
     List<UserResponse> userResponse = userService.list();
-    return ResponseGeneral.ofSuccess(LIST_USER, userResponse);
+    return ResponseGeneral.ofSuccess(messageService.getMessage(SUCCESS, language), userResponse);
   }
 
   @DeleteMapping("{id}")
   public ResponseGeneral<Void> delete(
-        @PathVariable(name = "id") int id
+        @PathVariable(name = "id") int id,
+        @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
   ) {
     log.info("(delete) Request to delete user with id: {}", id);
     userService.delete(id);
-    return new ResponseGeneral<>("success", DELETE_SUCCESS, null);
+    return ResponseGeneral.ofSuccess(messageService.getMessage(SUCCESS, language));
   }
 
   @PostMapping("login")
   public ResponseGeneral<LoginResponse> login(
-        @RequestBody LoginRequest loginRequest
+        @RequestBody LoginRequest loginRequest,
+        @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
   ) {
-    LoginResponse user = userService.login(loginRequest);
-    log.info("(login) User logged in successfully: {}", user.getUsername());
-    return new ResponseGeneral<>("success", LOGIN, user);
+    LoginResponse loginResponse = userService.login(loginRequest);
+    log.info("(login) User logged in successfully: {}", loginResponse.getUsername());
+    return ResponseGeneral.ofSuccess(messageService.getMessage(SUCCESS, language), loginResponse);
   }
 
-  @GetMapping("{username}")
-  public ResponseGeneral<UserResponse> getByUsername(
-        @RequestParam String username
-  ){
-    log.info("Request to get by username.");
-    UserResponse userResponse = userService.getByUsername(username);
-    return ResponseGeneral.ofSuccess(GET_BY_USERNAME, userResponse);
-  }
+@GetMapping({"username"})
+public ResponseGeneral<UserResponse> getByUsername(
+      @RequestParam(name = "username") String username,
+      @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+) {
+  log.info("Request to get by username.");
+  UserResponse userResponse = userService.getByUsername(username);
+  return ResponseGeneral.ofSuccess(messageService.getMessage(SUCCESS, language), userResponse);
+}
 
   @GetMapping("{id}")
   public ResponseGeneral<UserResponse> getById(
-        @PathVariable(name = "id") int id
+        @PathVariable(name = "id") int id,
+        @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
   ) {
     log.info("Request to get by id.");
     UserResponse userResponse = userService.getById(id);
-    return ResponseGeneral.ofSuccess(GET_BY_ID, userResponse);
+    return ResponseGeneral.ofSuccess(messageService.getMessage(SUCCESS, language), userResponse);
   }
 }

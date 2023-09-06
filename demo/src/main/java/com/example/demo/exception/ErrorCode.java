@@ -9,7 +9,7 @@ import lombok.Setter;
 @Data
 @Getter
 @Setter
-public class Error {
+public class ErrorCode {
   private String code;
   private Object message;
 }

@@ -1,59 +1,42 @@
-//package com.example.demo.dto.response;
-//
-//import com.fasterxml.jackson.annotation.JsonInclude;
-//import lombok.Data;
-//import org.springframework.http.HttpStatus;
-//
-//
-//@JsonInclude(JsonInclude.Include.NON_NULL)
-//@Data
-//public class ResponseGeneral<T> {
-//
-//  private String message;
-//  private int statusCode;
-//  private T data;
-//
-//  public ResponseGeneral(String message, T data, int statusCode) {
-//    this.message = message;
-//    this.statusCode = statusCode;
-//    this.data = data;
-//  }
-//  public ResponseGeneral(String message) {
-//    this.message = message;
-//  }
-//
-//  public static <T> ResponseGeneral<T> of(String message, T data, int statusCode) {
-//    return new ResponseGeneral<>(message, data, statusCode);
-//  }
-//  public static <T> ResponseGeneral<T> ofCreated(String message, T data) {
-//    return new ResponseGeneral<>(message, data, HttpStatus.CREATED.value());
-//  }
-//}
+
 package com.example.demo.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.example.demo.util.DateUtils;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
+@AllArgsConstructor(staticName = "of")
+@NoArgsConstructor
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class ResponseGeneral<T> {
-
-  private String status;
+  private int status;
   private String message;
   private T data;
+  private String timestamp;
 
-  public ResponseGeneral(String status, String message, T data) {
-    this.status = status;
-    this.message = message;
-    this.data = data;
+  public static <T> ResponseGeneral<T> of(int status, String message, T data) {
+    return of(status, message, data, DateUtils.getCurrentDateString());
   }
 
   public static <T> ResponseGeneral<T> ofSuccess(String message, T data) {
-    return new ResponseGeneral<>("success", message, data);
+    return of(HttpStatus.OK.value(), message, data, DateUtils.getCurrentDateString());
   }
 
-  public static <T> ResponseGeneral<T> ofError(String message, T data) {
-    return new ResponseGeneral<>("error", message, data);
+  public static <T> ResponseGeneral<T> ofSuccess(String message) {
+    return of(HttpStatus.OK.value(), message, null, DateUtils.getCurrentDateString());
+  }
+
+  public static <T> ResponseGeneral<T> ofCreated(String message, T data) {
+    return of(HttpStatus.CREATED.value(), message, data, DateUtils.getCurrentDateString());
+  }
+
+  public static <T> ResponseGeneral<T> ofCreated(String message) {
+    return of(HttpStatus.CREATED.value(), message, null, DateUtils.getCurrentDateString());
   }
 }
+
