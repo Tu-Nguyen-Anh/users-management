@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
       return userResponse;
     } else {
       logger.warn("User not found with ID: {}", id);
-      throw new UserNotFoundException(id);
+      throw new UserNotFoundException();
     }
   }
 
@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
     if (existingUser != null)
       userDAO.delete(id);
     else
-      throw new UserNotFoundException(id);
+      throw new UserNotFoundException();
   }
 
   @Override
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
     logger.info("Retrieving user with username: {}", username);
     User user = userDAO.getByUsername(username);
     if (user == null) {
-      throw new UserNotFoundException(username);
+      throw new UserNotFoundException();
     }
     UserResponse userResponse = new UserResponse(
           user.getId(),
@@ -102,7 +102,7 @@ public class UserServiceImpl implements UserService {
     logger.info("Retrieving user with id: {}", id);
     User user = userDAO.getById(id);
     if (user == null) {
-      throw new UserNotFoundException(id);
+      throw new UserNotFoundException();
     }
     UserResponse userResponse = new UserResponse(
           user.getId(),
@@ -116,7 +116,7 @@ public class UserServiceImpl implements UserService {
     User existingUser = userDAO.getByUsername(loginRequest.getUsername());
     if (existingUser == null) {
       logger.warn("User not found for login: {}", loginRequest.getUsername());
-      throw new UserNotFoundException(loginRequest.getUsername());
+      throw new UserNotFoundException();
     }
     //giai ma mat khau va so sanh voi password nhap vao
     if (!BCrypt.checkpw(loginRequest.getPassword(), existingUser.getPassword())) {

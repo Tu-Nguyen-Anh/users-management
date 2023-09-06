@@ -9,4 +9,9 @@ public class NotFoundException extends BaseException {
     addParam("id", id);
     addParam("objectName", objectName);
 }
+
+  public NotFoundException() {
+    setCode("com.example.demo.exception.base.NotFoundException");
+    setStatus(NOT_FOUND);
+  }
 }

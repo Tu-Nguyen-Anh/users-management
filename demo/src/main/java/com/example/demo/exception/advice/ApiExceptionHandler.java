@@ -90,7 +90,33 @@ public class ApiExceptionHandler {
     return "%" + key + "%";
   }
 
+  private static HttpStatus getHttpStatus(ErrorCode errorCode) {
+    String errorcode = errorCode.toString();
+    if (errorcode.toString().equals("BAD_REQUEST")) return HttpStatus.BAD_REQUEST;
+    else if (errorcode.toString().equals("UNAUTHORIZED")) return HttpStatus.UNAUTHORIZED;
+    else if (errorcode.toString().equals("FORBIDDEN")) return HttpStatus.FORBIDDEN;
+    else if (errorcode.toString().equals("NOT_FOUND")) return HttpStatus.NOT_FOUND;
+    else return HttpStatus.OK;
+  }
 
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<ResponseGeneral<Error>> handleValidationExceptions(
+        MethodArgumentNotValidException exception,
+        WebRequest webRequest
+  ) {
+    log.error("(handleValidationExceptions)exception: {}", exception.getMessage());
+    String language = Objects.nonNull(webRequest.getHeader(LANGUAGE)) ?
+          webRequest.getHeader(LANGUAGE) : DEFAULT_LANGUAGE;
+    String errorMessage = exception.getBindingResult().getFieldErrors().stream()
+          .map(DefaultMessageSourceResolvable::getDefaultMessage)
+          .findFirst()
+          .orElse(exception.getMessage());
+
+    log.error("(handleValidationExceptions) {}", errorMessage);
+    return ResponseEntity
+          .status(HttpStatus.BAD_REQUEST)
+          .body(getError(HttpStatus.BAD_REQUEST.value(), errorMessage, language));
+  }
 
   private ResponseGeneral<Error> getError(int status, String message, String language) {
     return ResponseGeneral.of(
