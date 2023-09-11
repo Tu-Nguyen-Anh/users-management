@@ -9,7 +9,6 @@ import com.example.demo.dto.response.UserResponse;
 import com.example.demo.exception.DuplicateUsernameException;
 import com.example.demo.exception.UserNotFoundException;
 import com.example.demo.exception.VerificationException;
-import com.example.demo.exception.base.AuthenticationException;
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
 import com.example.demo.util.TokenUtil;

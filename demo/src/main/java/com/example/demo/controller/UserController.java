@@ -82,15 +82,15 @@ public class UserController {
     return ResponseGeneral.ofSuccess(messageService.getMessage(SUCCESS, language), loginResponse);
   }
 
-@GetMapping({"username"})
-public ResponseGeneral<UserResponse> getByUsername(
-      @RequestParam(name = "username") String username,
-      @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
-) {
-  log.info("Request to get by username.");
-  UserResponse userResponse = userService.getByUsername(username);
-  return ResponseGeneral.ofSuccess(messageService.getMessage(SUCCESS, language), userResponse);
-}
+  @GetMapping({"username"})
+  public ResponseGeneral<UserResponse> getByUsername(
+        @RequestParam(name = "username") String username,
+        @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+  ) {
+    log.info("Request to get by username.");
+    UserResponse userResponse = userService.getByUsername(username);
+    return ResponseGeneral.ofSuccess(messageService.getMessage(SUCCESS, language), userResponse);
+  }
 
   @GetMapping("{id}")
   public ResponseGeneral<UserResponse> getById(
